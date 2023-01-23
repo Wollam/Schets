@@ -7,7 +7,7 @@ from Tools2         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, T
 class SchetsWin(Toplevel):
     def __init__(self,parent):
         super().__init__(parent)
-        self.geometry("800x600")
+        self.geometry("800x800")
 
         deTools = [PenTool(), LijnTool(), RechthoekTool(), VolRechthoekTool(), TekstTool(), GumTool()]
         deKleuren = ["black", "red", "green", "blue", "yellow", "magenta", "cyan"]
