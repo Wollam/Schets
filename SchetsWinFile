@@ -15,7 +15,7 @@ class SchetsWin(Toplevel):
         self.huidigeTool = deTools[0]
 
         paneel = Frame(self)
-        paneel.pack(side="left", padx=10)
+        paneel.pack(side="left", padx=50)
 
         self.schetscontrol = SchetsControl(self)
         self.schetscontrol.pack(fill="both", expand=True)
@@ -106,7 +106,8 @@ class SchetsWin(Toplevel):
         self.gekozenButton = IntVar(box, value=0)
         for tool in tools:
             naam = str(tool)
-            tool.afb = PhotoImage(Image.open(f"Icons/{naam}.png"))
+            tool.afb = PhotoImage(Image.open(f"SchetsEditorP\Icons/{naam}.png"))
             b = Radiobutton(box, text=str(tool), value=t, variable=self.gekozenButton, image=tool.afb, compound="bottom", command=lambda t=tool:self.selecteerTool(t))
             b.pack()
             t = t+1
+
