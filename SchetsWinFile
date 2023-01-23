@@ -2,14 +2,14 @@ from tkinter       import Toplevel, Menu, Frame, Label, Button, Radiobutton, Lis
 from PIL.ImageTk   import PhotoImage
 from PIL           import Image
 from SchetsControl import SchetsControl
-from Tools2         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, TekstTool, GumTool
+from Tools         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, TekstTool, GumTool, ovaal, gevuldeovaal
 
 class SchetsWin(Toplevel):
     def __init__(self,parent):
         super().__init__(parent)
         self.geometry("800x600")
 
-        deTools = [PenTool(), LijnTool(), RechthoekTool(), VolRechthoekTool(), TekstTool(), GumTool()]
+        deTools = [PenTool(), LijnTool(), RechthoekTool(), VolRechthoekTool(), TekstTool(), GumTool(), ovaal(), gevuldeovaal()]
         deKleuren = ["black", "red", "green", "blue", "yellow", "magenta", "cyan"]
 
         self.huidigeTool = deTools[0]
