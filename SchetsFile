@@ -8,44 +8,24 @@ class Schets:
 
     def __init__(self):
         self.bitmap = Image.new(mode="RGBA", size=(1,1), color="white")
-
+  
     def VeranderAfmeting(self, wh):
         nieuweBitmap = Image.new(mode="RGBA", size=wh, color="white")
         nieuweBitmap.paste(self.bitmap, (0,0))
         self.bitmap = nieuweBitmap
 
-    def Tekening(self):
-        return PhotoImage(self.bitmap)
+    def Tekening(self, filename, filetype):
+        image = self.bitmap
+        if filetype == 'jpg':
+            convertimage = image.convert('RGB')
+            convertimage.save(fp= f"{filename}" + f".{filetype}")
+        elif filetype in ['png', 'bmp']:
+            image.save(fp= f"{filename}" + f".{filetype}")
 
+        return PhotoImage(self.bitmap)
+      
     def Schoon(self):
         self.bitmap = Image.new(mode="RGBA", size=(self.bitmap.width, self.bitmap.height), color="white")
 
     def Roteer(self):
         self.bitmap = self.bitmap.rotate(90)
-
-    def savefile2(self, filename, type):
-        file1 = type
-        filename1 = filename
-        if file1 == 'jpg':
-            convertimage = self.bitmap.convert('RGB')
-            convertimage.save(fp= f"{filename1}" + f".{file1}")
-        if file1 == 'png' or 'bmp':
-            self.bitmap.save(fp= f"{filename1}" + f".{file1}")
-  
-
-
-class popupWindow(object):
-    def __init__(self,master, type):
-        top=self.top=Toplevel(master)
-        self.l=Label(top,text="Voer de bestandsnaam in")
-        self.l.pack()
-        self.e=Entry(top)
-        self.e.pack()
-        self.b=Button(top,text='Ok',command=lambda:self.cleanup(type))
-        self.b.pack()
-
-    def cleanup(self, type):
-        filename=self.e.get()
-        file = type
-        self.top.destroy()
-        Schets.savefile2(self, filename, file)
