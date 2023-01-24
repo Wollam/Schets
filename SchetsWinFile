@@ -1,8 +1,7 @@
 from tkinter       import Toplevel, Menu, Frame, Label, Button, Radiobutton, Listbox, IntVar, ttk
 from PIL.ImageTk   import PhotoImage
 from PIL           import Image
-from SchetsControl import SchetsControl
-from Schets import popupWindow
+from SchetsControl import SchetsControl, popupWindow
 from Tools         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, TekstTool, GumTool, ovaal, gevuldeovaal
 
 class SchetsWin(Toplevel):
@@ -71,11 +70,12 @@ class SchetsWin(Toplevel):
         submenu = Menu(menu, tearoff=0)
 
         for filetype in Filetypes:
-            submenu.add_command(label=filetype, command=lambda type=filetype:popupWindow(None, type))
+            submenu.add_command(label=filetype, command=lambda type=filetype:popupWindow(None, type, self.schetscontrol))
         menu.add_cascade(label="Opslaan als", menu=submenu)
         menubar.add_cascade(label="File", menu=menu)
 
     def maakToolMenu(self, menubar, tools):
+    
         menu = Menu(menubar, tearoff=0)
         for tool in tools:
             naam = str(tool)
@@ -117,6 +117,9 @@ class SchetsWin(Toplevel):
             b = Radiobutton(box, text=str(tool), value=t, variable=self.gekozenButton, image=tool.afb, compound="bottom", command=lambda t=tool:self.selecteerTool(t))
             b.pack()
             t = t+1
+
+
+
 
 
 
