@@ -2,20 +2,22 @@ from tkinter       import Toplevel, Menu, Frame, Label, Button, Radiobutton, Lis
 from PIL.ImageTk   import PhotoImage
 from PIL           import Image
 from SchetsControl import SchetsControl
-from Tools2         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, TekstTool, GumTool
+from Schets import popupWindow
+from Tools         import PenTool, LijnTool, RechthoekTool, VolRechthoekTool, TekstTool, GumTool, ovaal, gevuldeovaal
 
 class SchetsWin(Toplevel):
     def __init__(self,parent):
         super().__init__(parent)
-        self.geometry("800x800")
+        self.geometry("940x800")
 
-        deTools = [PenTool(), LijnTool(), RechthoekTool(), VolRechthoekTool(), TekstTool(), GumTool()]
+        deTools = [PenTool(), LijnTool(), RechthoekTool(), VolRechthoekTool(), TekstTool(), GumTool(), ovaal(), gevuldeovaal()]
         deKleuren = ["black", "red", "green", "blue", "yellow", "magenta", "cyan"]
+        Filetypes = ["png", 'jpg', 'bmp']
 
         self.huidigeTool = deTools[0]
 
         paneel = Frame(self)
-        paneel.pack(side="left", padx=50)
+        paneel.pack(side="left", padx=10)
 
         self.schetscontrol = SchetsControl(self)
         self.schetscontrol.pack(fill="both", expand=True)
@@ -25,7 +27,7 @@ class SchetsWin(Toplevel):
         self.bind("<Key>", self.keypress)
 
         menubar = Menu(self)
-        self.maakFileMenu(menubar)
+        self.maakFileMenu(menubar, Filetypes)
         self.maakToolMenu(menubar, deTools)
         self.maakActieMenu(menubar, deKleuren)
         self.maakToolButtons(paneel, deTools)
@@ -63,9 +65,14 @@ class SchetsWin(Toplevel):
         if len(t)>0:
             self.schetscontrol.VeranderKleur(ea.widget.get(t[0]))
 
-    def maakFileMenu(self, menubar):
+    def maakFileMenu(self, menubar, Filetypes):
         menu = Menu(menubar, tearoff=0)
         menu.add_command(label="Sluiten", command=self.destroy)
+        submenu = Menu(menu, tearoff=0)
+
+        for filetype in Filetypes:
+            submenu.add_command(label=filetype, command=lambda type=filetype:popupWindow(None, type))
+        menu.add_cascade(label="Opslaan als", menu=submenu)
         menubar.add_cascade(label="File", menu=menu)
 
     def maakToolMenu(self, menubar, tools):
@@ -110,4 +117,7 @@ class SchetsWin(Toplevel):
             b = Radiobutton(box, text=str(tool), value=t, variable=self.gekozenButton, image=tool.afb, compound="bottom", command=lambda t=tool:self.selecteerTool(t))
             b.pack()
             t = t+1
+
+
+
 
