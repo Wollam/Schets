@@ -1,4 +1,4 @@
-from tkinter import Label
+from tkinter import Label, Toplevel, Entry, Button
 from Schets import Schets
 
 class SchetsControl(Label):
@@ -6,7 +6,11 @@ class SchetsControl(Label):
         super().__init__(parent)
         self.bind("<Configure>", self.vergroot)
         self.schets = Schets()
+        self.filename = ""
+        self.filetype = ""
         self.kleur = "black"
+        self.defaultname = 'default'
+        self.defaulttype = 'png'
 
     def vergroot(self, ea):
         wh = (self.winfo_width(), self.winfo_height())
@@ -14,7 +18,10 @@ class SchetsControl(Label):
         self.Teken()
 
     def Teken(self):
-        self.foto = self.schets.Tekening()
+        if self.filename == "":
+            self.foto = self.schets.Tekening(None, None)
+        else:
+            self.foto = self.schets.Tekening(self.filename, self.filetype)
         self.configure(image=self.foto)
 
     def Schoon(self):
@@ -27,3 +34,22 @@ class SchetsControl(Label):
 
     def VeranderKleur(self, k):
         self.kleur = k
+
+class popupWindow:
+    def __init__(self, master, filetype, schetsControl):
+        self.schetsControl = schetsControl
+        top = self.top = Toplevel(master)
+        self.l = Label(top, text="Enter the filename")
+        self.l.pack()
+        self.e = Entry(top)
+        self.e.pack()
+        self.b = Button(top, text='Ok', command=lambda: self.cleanup(filetype))
+        self.b.pack()
+        self.bitmap2 = Schets()
+
+    def cleanup(self, type):
+        filename = self.e.get()
+        self.schetsControl.filename = filename
+        self.schetsControl.filetype = type
+        self.schetsControl.Teken()
+        self.top.destroy()
