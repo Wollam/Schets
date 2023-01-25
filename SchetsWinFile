@@ -31,6 +31,7 @@ class SchetsWin(Toplevel):
         self.maakToolButtons(paneel, deTools)
         self.maakActieButtons(paneel, deKleuren)
         self.configure(menu=menubar)
+        self.protocol("WM_DELETE_WINDOW", self.closing)
 
         self.vast = False
 
@@ -110,3 +111,12 @@ class SchetsWin(Toplevel):
             b = Radiobutton(box, text=str(tool), value=t, variable=self.gekozenButton, image=tool.afb, compound="bottom", command=lambda t=tool:self.selecteerTool(t))
             b.pack()
             t = t+1
+            
+    def closing(self):
+        result = True
+        if not self.schetscontrol.filename:
+           result = messagebox.askyesno("Are you sure you want to close without saving?")
+        if result:
+                self.destroy()
+        else:   
+            pass
