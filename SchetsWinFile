@@ -1,4 +1,4 @@
-from tkinter       import Toplevel, Menu, Frame, Label, Button, Radiobutton, Listbox, IntVar, ttk
+from tkinter       import Toplevel, Menu, Frame, Label, Button, Radiobutton, Listbox, IntVar, messagebox
 from PIL.ImageTk   import PhotoImage
 from PIL           import Image
 from SchetsControl import SchetsControl, popupWindow
@@ -32,6 +32,7 @@ class SchetsWin(Toplevel):
         self.maakToolButtons(paneel, deTools)
         self.maakActieButtons(paneel, deKleuren)
         self.configure(menu=menubar)
+        self.protocol("WM_DELETE_WINDOW", self.closing)
 
         self.vast = False
 
@@ -66,7 +67,7 @@ class SchetsWin(Toplevel):
 
     def maakFileMenu(self, menubar, Filetypes):
         menu = Menu(menubar, tearoff=0)
-        menu.add_command(label="Sluiten", command=self.destroy)
+        menu.add_command(label="Sluiten", command=self.closing)
         submenu = Menu(menu, tearoff=0)
 
         for filetype in Filetypes:
@@ -118,6 +119,14 @@ class SchetsWin(Toplevel):
             b.pack()
             t = t+1
 
+    def closing(self):
+        result = True
+        if not self.schetscontrol.filename:
+           result = messagebox.askyesno("Are you sure you want to close without saving?")
+        if result:
+                self.destroy()
+        else:   
+            pass
 
 
 
