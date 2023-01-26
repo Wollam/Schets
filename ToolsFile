@@ -11,12 +11,18 @@ class StartpuntTool(SchetsTool):
     def __init__(self):
         super().__init__()
         self.startpunt = (0,0)
+        self.elementen_lijst = []
 
     def MuisVast(self, sc, pt):
         self.startpunt = pt
 
     def MuisLos(self, sc, pt):
         self.kwast = sc.kleur
+
+    def AddElement(self, element):
+        self.elementen_lijst.append(element)
+        print(self.elementen_lijst)
+
 
 class TekstTool(StartpuntTool):
     def __init__(self):
@@ -77,6 +83,10 @@ class RechthoekTool(TweepuntTool):
     def Bezig(self, draw, p1, p2):
         draw.rectangle((p1,p2), outline=self.kwast)
 
+    def Compleet(self, draw, p1, p2):
+        draw.rectangle((p1,p2), outline=self.kwast)
+        self.AddElement(RechthoekElement(p1, p2, self.kwast))
+
 class VolRechthoekTool(RechthoekTool):
     def __init__(self):
         super().__init__()
@@ -85,6 +95,7 @@ class VolRechthoekTool(RechthoekTool):
         return "vlak"
 
     def Compleet(self, draw, p1, p2):
+        self.AddElement(VolRechthoekElement(p1, p2, self.kwast))
         draw.rectangle((p1,p2), fill=self.kwast)
 
 class LijnTool(TweepuntTool):
@@ -96,6 +107,10 @@ class LijnTool(TweepuntTool):
 
     def Bezig(self, draw, p1, p2):
         draw.line((p1,p2), fill=self.kwast, width=3)
+        
+    def Compleet(self, draw, p1, p2):
+        draw.line((p1,p2), fill=self.kwast, width=3)
+        self.AddElement(LijnElement(p1, p2, self.kwast))
 
 class PenTool(LijnTool):
     def __init__(self):
@@ -108,15 +123,35 @@ class PenTool(LijnTool):
         self.MuisLos(sc, pt)
         self.MuisVast(sc, pt)
 
-class GumTool(PenTool):
+    def Compleet(self, draw, p1, p2):
+        super().Compleet(draw, p1, p2)
+        self.AddElement(PenElement(self.startpunt, p2))
+
+class GumTool(TweepuntTool):
     def __init__(self):
         super().__init__()
+    
+    def MuisDrag(self, sc, pt):
+        pass
 
     def __str__(self):
         return "gum"
 
     def Bezig(self, draw, p1, p2):
-        draw.line((p1,p2), fill="white", width=7)
+        print(Element.elements_list)
+        for element in Element.elements_list:
+            print("1")
+            if element.PointInShape(p1):
+                Element.elements_list.remove(element)
+                print("2")
+                break
+        self.ReconstrueerBitmap(draw)
+                
+    def ReconstrueerBitmap(self, draw):
+        draw.rectangle((0,0,self.breedte,self.hoogte),fill=self.achtergrondkleur)
+        print(Element.elements_list)
+        for element in Element.elements_list:
+            element.Teken(draw)
 
 class ovaal(TweepuntTool):
     def __init__(self):
@@ -130,9 +165,16 @@ class ovaal(TweepuntTool):
         radius = ((p2[0]-p1[0])/2, (p2[1]-p1[1])/2)
         draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), outline=self.kwast)
 
+    def Compleet(self, draw, p1, p2):
+        center = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
+        radius = ((p2[0]-p1[0])/2, (p2[1]-p1[1])/2)
+        self.AddElement(OvaalElement(center, radius, self.kwast))
+        draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), outline=self.kwast)
+
 class gevuldeovaal(ovaal):
     def __init__(self):
         super().__init__()
+        
 
     def __str__(self):
         return "gevulde ovaal"
@@ -141,3 +183,92 @@ class gevuldeovaal(ovaal):
         center = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
         radius = ((p2[0]-p1[0])/2, (p2[1]-p1[1])/2)
         draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), fill=self.kwast)
+        
+
+class Element:
+    elements_list = []
+
+class RechthoekElement(Element):
+    def __init__(self, p1, p2,):
+        self.p1 = p1
+        self.p2 = p2
+        self.kwast = self.kwast
+        Element.elements_list.append(self)
+
+
+    def PointInShape(self, point):
+        x1, y1 = self.p1
+        x2, y2 = self.p2
+        return x1 <= point[0] <= x2 and y1 <= point[1] <= y2
+
+    def Teken(self, draw):
+        draw.rectangle((self.p1, self.p2), outline=self.kwast)
+
+class VolRechthoekElement(RechthoekElement):
+    def __init__(self, p1, p2, kwast,):
+        super().__init__(p1, p2, kwast)
+        Element.elements_list.append(self)
+    
+
+    def Teken(self, draw):
+        draw.rectangle((self.p1, self.p2), fill=self.kwast, outline=self.kwast)
+
+class LijnElement(Element):
+    def __init__(self, p1, p2, kwast):
+        self.p1 = p1
+        self.p2 = p2
+        self.kwast = kwast
+        Element.elements_list.append(self)
+
+    def PointInShape(self, point):
+        x1, y1 = self.p1
+        x2, y2 = self.p2
+        if x1 == x2:
+            return min(y1, y2) <= point[1] <= max(y1, y2) and point[0] == x1
+        elif y1 == y2:
+            return min(x1, x2) <= point[0] <= max(x1, x2) and point[1] == y1
+        else:
+            m = (y2-y1)/(x2-x1)
+            b = y1 - m*x1
+            return point[1] == m*point[0] + b
+
+    def Teken(self, draw):
+        draw.line((self.p1, self.p2), fill=self.kwast, width=3)
+    
+class PenElement(LijnElement):
+    def __init__(self, p1, kwast):
+        super().__init__(p1, p1, kwast)
+        Element.elements_list.append(self)
+
+class OvaalElement(Element):
+    def __init__(self, p1, p2, kwast):
+        self.p1 = p1
+        self.p2 = p2
+        self.kwast = kwast
+        Element.elements_list.append(self)
+        
+    def PointInShape(self, point):
+        print("3")
+        center = ((self.p1[0]+self.p2[0])/2, (self.p1[1]+self.p2[1])/2)
+        radius = ((self.p2[0]-self.p1[0])/2, (self.p2[1]-self.p1[1])/2)
+        if (point[0] - center[0]) ** 2 / (radius[0]) ** 2 + (point[1] - center[1]) ** 2 / (radius[1]) ** 2 <= 1:
+            print("true")
+            return True
+        print("false")
+        return False
+
+    def Teken(self, draw, ):
+        center = ((self.p1[0]+self.p2[0])/2, (self.p1[1]+self.p2[1])/2)
+        radius = ((self.p2[0]-self.p1[0])/2, (self.p2[1]-self.p1[1])/2)
+        draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), outline=self.kwast)
+
+class GevuldeOvaalElement(OvaalElement):
+    def __init__(self, p1, p2):
+        super().__init__(p1, p2)
+        Element.elements_list.append(self)
+        
+    def Teken(self, draw):
+        center = ((self.p1[0]+self.p2[0])/2, (self.p1[1]+self.p2[1])/2)
+        radius = ((self.p2[0]-self.p1[0])/2, (self.p2[1]-self.p1[1])/2)
+        draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), fill=self.kwast, outline=self.kwast)
+
