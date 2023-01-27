@@ -157,16 +157,12 @@ class GumTool(TweepuntTool):
                 Element.ellijst.remove(element)
                 element.Teken(draw, (element.p1), (element.p2), kleur)
                 print (Element.ellijst)
+                print(1)
                 break
-            else:
-                print (4)
-                self.Compleet2(draw, element.p1, element.p2)
-
-    def Compleet2(self, draw, p1, p2):
-        for element in Element.ellijst:
+        for element in reversed(Element.ellijst):
             kleur = Kleur
-            element.Teken(draw, p1, p2, kleur)
-            print (5)
+            print(2)
+            element.Teken(draw, element.p1, element.p2, kleur)
 
 
 class ovaal(TweepuntTool):
