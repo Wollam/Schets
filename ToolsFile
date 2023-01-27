@@ -1,8 +1,6 @@
-from SchetsControl import SchetsControl
 from PIL.ImageFont import truetype
 from PIL.ImageDraw import Draw
 from PIL.ImageTk   import PhotoImage
-from SchetsControl import SchetsControl
 from PIL import ImageDraw
 
 Kleur = "grey"
@@ -149,13 +147,10 @@ class GumTool(TweepuntTool):
 
     def Bezig(self, draw, p1, p2):
         for element in reversed(Element.ellijst):
-            print (element.p1, element.p2)
             if element.PointInShape(p1):
                 kleur = "White"
                 Element.ellijst.remove(element)
                 element.Teken(draw, (element.p1), (element.p2), kleur)
-                print (Element.ellijst)
-                print(1)
                 break
         for element in reversed(Element.ellijst):
             kleur = Kleur
@@ -178,7 +173,7 @@ class ovaal(TweepuntTool):
     def Compleet(self, draw, p1, p2):
         center = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
         radius = ((p2[0]-p1[0])/2, (p2[1]-p1[1])/2)
-        OvaalElement(center, radius, self.kwast)
+        OvaalElement(p1, p2)
         draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), outline=self.kwast)
 
 class gevuldeovaal(ovaal):
@@ -196,7 +191,7 @@ class gevuldeovaal(ovaal):
     def Compleet(self, draw, p1, p2):
         center = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
         radius = ((p2[0]-p1[0])/2, (p2[1]-p1[1])/2)
-        OvaalElement(center, radius, self.kwast)
+        GevuldeOvaalElement(p1,p2)
         draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), fill=self.kwast)
         
 
@@ -227,7 +222,7 @@ class RechthoekElement(Element):
 
 class VolRechthoekElement(RechthoekElement):
     def __init__(self, p1, p2,):
-        super().__init__(p1, p2,)
+        super().__init__(p1, p2)
  
     def Teken(self, draw, p1, p2, kleur):
         draw.rectangle((p1, p2), fill=kleur)
@@ -260,31 +255,32 @@ class PenElement(LijnElement):
 
 
 class OvaalElement(Element):
-    def __init__(self, p1, p2, kwast):
+    def __init__(self, p1, p2):
+        super().__init__()
         self.p1 = p1
         self.p2 = p2
-        self.kwast = kwast
         Element.ellijst.append(self)
 
         
     def PointInShape(self, point):
-        print (self.p2)
-        center = ((self.p1[0]+self.p2[0])/2, (self.p1[1]+self.p2[1])/2)
-        radius = ((self.p2[0]-self.p1[0])/2, (self.p2[1]-self.p1[1])/2)
+        x1, y1 = self.p1
+        x2, y2 = self.p2
+        center = ((x1+x2)/2, (y1+y2)/2)
+        radius = ((x2-x1)/2, (y2-y1)/2)
         if (point[0] - center[0]) ** 2 / (radius[0]) ** 2 + (point[1] - center[1]) ** 2 / (radius[1]) ** 2 <= 1:
-            print("true")
             return True
-        print("false")
         return False
 
     def Teken(self, draw, p1, p2, kleur):
-        center = ((p1[0]+p2[0])/2, (p1[1]+p2[1])/2)
-        radius = ((p2[0]-p1[0])/2, (p1[1]-p1[1])/2)
+        x1, y1 = self.p1
+        x2, y2 = self.p2
+        center = ((x1+x2)/2, (y1+y2)/2)
+        radius = ((x2-x1)/2, (y2-y1)/2)
         draw.ellipse((center[0]-radius[0], center[1]-radius[1], center[0]+radius[0], center[1]+radius[1]), outline=kleur)
 
 class GevuldeOvaalElement(OvaalElement):
     def __init__(self, p1, p2,):
-        super().__init__( p1, p2,)
+        super().__init__(p1, p2,)
   
         
     def Teken(self, draw, p1, p2, kleur):
@@ -309,3 +305,4 @@ class TekstElement():
             return True
         else:
             return False
+
