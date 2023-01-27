@@ -27,9 +27,6 @@ class StartpuntTool(SchetsTool):
         Kleur = sc.kleur
      
 
-
-
-
 class TekstTool(StartpuntTool):
     def __init__(self):
         super().__init__()
@@ -151,18 +148,19 @@ class GumTool(TweepuntTool):
         return "gum"
 
     def Bezig(self, draw, p1, p2):
+        print (p1,p2)
         print(Element.ellijst)
-        for element in Element.ellijst:
-            print("1")
+        for element in reversed(Element.ellijst):
+            print (element.p1, element.p2)
             if element.PointInShape(p1):
                 kleur = "White"
-                element.Teken(draw, p1, p2, kleur)
                 Element.ellijst.remove(element)
+                element.Teken(draw, (element.p1), (element.p2), kleur)
                 print (Element.ellijst)
                 break
             else:
                 print (4)
-                self.Compleet2(draw, p1, p2)
+                self.Compleet2(draw, element.p1, element.p2)
 
     def Compleet2(self, draw, p1, p2):
         for element in Element.ellijst:
@@ -221,7 +219,7 @@ class RechthoekElement(Element):
         super().__init__()
         self.p1 = p1
         self.p2 = p2
-        Element.ellijst.append(self)
+        Element.ellijst.append((self))
 
 
     def PointInShape(self, point):
@@ -238,8 +236,6 @@ class VolRechthoekElement(RechthoekElement):
         super().__init__(p1, p2,)
  
     def Teken(self, draw, p1, p2, kleur):
-        print (kleur)
-        print ("teken")
         draw.rectangle((p1, p2), fill=kleur)
 
 class LijnElement(Element):
