@@ -116,7 +116,7 @@ class LijnTool(TweepuntTool):
         
     def Compleet(self, draw, p1, p2):
         draw.line((p1,p2), fill=self.kwast, width=3)
-        LijnElement(p1, p2, self.kwast)
+        LijnElement(p1, p2)
 
 class PenTool(LijnTool):
     def __init__(self):
@@ -228,10 +228,9 @@ class VolRechthoekElement(RechthoekElement):
         draw.rectangle((p1, p2), fill=kleur)
 
 class LijnElement(Element):
-    def __init__(self, p1, p2, kwast):
+    def __init__(self, p1, p2):
         self.p1 = p1
         self.p2 = p2
-        self.kwast = kwast
         Element.ellijst.append(self)
 
     def PointInShape(self, point):
@@ -246,8 +245,8 @@ class LijnElement(Element):
             b = y1 - m*x1
             return point[1] == m*point[0] + b
 
-    def Teken(self, draw, p1,p2):
-        draw.line((p1, p2), fill=self.kwast, width=3)
+    def Teken(self, draw, p1,p2, kleur):
+        draw.line((p1, p2), width=3)
     
 class PenElement(LijnElement):
     def __init__(self, p1, kwast):
