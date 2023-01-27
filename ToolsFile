@@ -5,6 +5,12 @@ from PIL.ImageTk   import PhotoImage
 from SchetsControl import SchetsControl
 from PIL import ImageDraw
 
+SCHETS = None
+
+def set_schets(schets):
+    global SCHETS
+    SCHETS = schets
+
 
 class SchetsTool:
     def __init__(self):
@@ -131,9 +137,22 @@ class PenTool(LijnTool):
         super().Compleet(draw, p1, p2)
         self.AddElement(PenElement(self.startpunt, p2))
 
+class ReconstructBitmap:
+    def __init__(self, SCHETS):
+        self.schets = SCHETS
+
+    def ReconstrueerBitmap(self):
+        self.schets.Schoon()
+        draw = ImageDraw.Draw(self.schets.bitmap)
+        draw.rectangle((0,0,self.schets.bitmap.width,self.schets.bitmap.height),fill='white')
+        for element in Element.elements_list:
+            element.Draw(draw)
+
 class GumTool(TweepuntTool):
     def __init__(self):
         super().__init__()
+        self.schets = SCHETS
+        self.reconstruct = ReconstructBitmap(SCHETS)
     
     def MuisDrag(self, sc, pt):
         pass
